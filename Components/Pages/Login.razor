@@ -1,0 +1,123 @@
+﻿@page "/login"
+@attribute [AllowAnonymous]
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ISnackbarService SnackbarService
+
+
+<section class="auth-section">
+    <div style="max-width: 25rem; margin: auto; margin-top: 10rem">
+        <EditForm Model="@req" OnValidSubmit="OnLoginClick" FormName="LoginForm">
+
+            <DataAnnotationsValidator />
+
+            <MudText Typo="Typo.h4"
+                     Align="Align.Center"
+                     Class="mt-4">
+                <b>SIGN IN</b>
+            </MudText>
+
+            <MudText Align="Align.Center"
+                     Class="mb-4 mt-1"
+                     Typo="Typo.subtitle2">
+                Entry Point: Access Control for Online Learning
+            </MudText>
+
+            <MudTextField @bind-Value="@req.Email"
+                          Label="Email"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Email is required"
+                          Class="mb-4 mt-3"
+                          For="@(() => req.Email)"
+                          InputType="InputType.Text"
+                          Margin="Margin.Dense">
+            </MudTextField>
+
+            <MudTextField @bind-Value="@req.Password"
+                          Label="Password"
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.End"
+                          Required="true"
+                          RequiredError="Password is required"
+                          InputType="@PasswordInput"
+                          AdornmentIcon="@PasswordInputIcon"
+                          OnAdornmentClick="OnShowPasswordClick"
+                          AdornmentAriaLabel="Show Password"
+                          Class="mb-2"
+                          For="@(() => req.Password)"
+                          Margin="Margin.Dense">
+            </MudTextField>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Class="mb-4 mt-3"
+                       Size="Size.Large"
+                       ButtonType="ButtonType.Submit">
+                Login
+            </MudButton>
+        </EditForm>
+
+        <MudDivider />
+
+        <MudButton Color="Color.Primary" FullWidth="true" Class="mb-4 mt-3" Size="Size.Large" @onclick="NavigateToRegister">
+            Register
+        </MudButton>
+
+    </div>
+</section>
+
+
+
+@code {
+    [SupplyParameterFromForm]
+    LoginModel req { get; set; } = new();
+
+    private async Task OnLoginClick(EditContext context)
+    {
+        var response = await AuthService.Login(req);
+
+        if (response.Success)
+        {
+            SnackbarService.Success(response.Message);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            SnackbarService.Error(response.Message);
+        }
+    }
+
+    private void NavigateToRegister()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+
+    #region ShowPassword
+
+    private bool show = false;
+    private InputType PasswordInput = InputType.Password;
+    private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private void OnShowPasswordClick()
+    {
+        if (show)
+        {
+            show = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            show = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    #endregion
+}

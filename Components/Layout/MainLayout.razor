@@ -1,0 +1,56 @@
+﻿@rendermode InteractiveServer
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject IHttpContextAccessor httpContextAccessor
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudLayout>
+            <MudAppBar Elevation="25" Fixed="true">
+                @*         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" /> *@
+                <MudText Typo="Typo.h5" Style="font-weight: 600; font-size: 20px">Online Learning System</MudText>
+                <MudSpacer />
+                <MudButton OnClick="OnLogoutClick">Log out</MudButton>
+            </MudAppBar>
+            <MudMainContent Class="relative">
+                <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <MudLayout>
+            <MudAppBar Elevation="25" Fixed="true">
+                @*         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" /> *@
+                <MudText Typo="Typo.h5" Style="font-weight: 600; font-size: 20px">Online Learning System</MudText>
+                <MudSpacer />
+            </MudAppBar>
+            <MudMainContent Class="relative">
+                <MudContainer MaxWidth="MaxWidth.Large">
+<OLA.Components.Pages.Login />
+                </MudContainer>
+            </MudMainContent>
+
+        </MudLayout>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
+@code {
+    private bool _drawerOpen = true;
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+
+    private async Task OnLogoutClick()
+    {
+        await AuthService.Logout();
+    }
+}
